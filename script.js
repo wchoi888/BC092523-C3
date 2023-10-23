@@ -1,17 +1,28 @@
-// assigning variables for button and each criteria
+// Selecting the generate button element from the HTML
 var generateBtn = document.querySelector("#generate");
+
+// Defining character sets for different criteria
 var lowerCaseValues = "abcdefghijklmnopqrstuvwxyz";
 var upperCaseValues = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 var numberValues = "0123456789";
 var specialCharacterValues = " !#$%&'()*+,-\"./:;<=>?@[]^_`{|}~";
 
-//defining the right password function
+// Defining function to write password
 function writePassword() {
-  //calling generatePassword function and assign it to the variable password
-  var password = generatePassword();
-  // selecting the form field and assigning it to the passwordText variable
+  // Defining variables for password criteria and length
+  var criteriaParams = selectCriteria();
+  var length = genPwdLen();
+
+  // Defining variable to generate password based on password criteria and length
+  var password = generatePassword(criteriaParams, length);
+
+  // Defining variable to display password in the text field
   var passwordText = document.querySelector("#password");
-  // assigning variable for user input for password criteria
+  passwordText.value = password;
+}
+
+// Defining function to prompt user for criteria selection and return validation for criteria
+function selectCriteria() {
   var lowerCase = confirm(
     "Would you like to include lower case letters in your password:  ok or cancel"
   );
@@ -24,88 +35,74 @@ function writePassword() {
   var specialChar = confirm(
     "Would you like to include special characters in your password:  ok or cancel"
   );
+  return criteriaValidation(lowerCase, upperCase, numericValue, specialChar);
+}
+
+// Defining function to prompt user for password length and return password length once validated
+function genPwdLen() {
   var passwordLength = Number(
     prompt("Would you please pick a length between 8 and 128 characters?")
   );
-  // checking and validating if the password length criteria is met
-  if (passwordLength < 8 && passwordLength > 128) {
-    passwordLength = Number(
-      prompt("Would you please pick a length between 8 and 128 characters?")
-    );
-  }
-  //validating at least one of the password criteria is selected before generating password
-  if (lowerCase || upperCase || numericValue || specialChar) {
-    var password = generatePassword(
-      passwordLength,
-      lowerCase,
-      upperCase,
-      numericValue,
-      specialChar
-    );
-  } else {
-    // if no criteria is selected the first time, we will ask the questions again
-    alert("please select one or more of the password criteria");
-    lowerCase = confirm(
-      "Would you like to include lower case letters in your password:  ok or cancel"
-    );
-    upperCase = confirm(
-      "Would you like to include upper case letters in your password:  ok or cancel"
-    );
-    numericValue = confirm(
-      "Would you like to include numbers in your password:  ok or cancel"
-    );
-    specialChar = confirm(
-      "Would you like to include special characters in your password:  ok or cancel"
-    );
-  }
-  //assigning the generated password value to the form field to be displayed
-  passwordText.value = password;
-
-  //creating a function that returns an array of random characters based on the password criteria selected
+  return passwordLengthValidation(passwordLength);
 }
-function setCharacters(lowerCase, upperCase, numericValue, specialChar) {
+
+// Defining function to validate password criteria selection
+function criteriaValidation(lower, upper, numeric, special) {
+  var criteria = [lower, upper, numeric, special];
+
+  // If no criteria are selected, prompt again
+  if (!(lower || upper || numeric || special)) {
+    alert("Please select at least one password criteria");
+    return selectCriteria();
+  }
+  return criteria;
+}
+//Defining function to validate password length
+
+function passwordLengthValidation(passwordLength) {
+  if (passwordLength < 8 || passwordLength > 128 || isNaN(passwordLength)) {
+    alert("Please select a valid password length between 8 and 128");
+    return genPwdLen();
+  }
+  return passwordLength;
+}
+
+// Defining function to randomly select characters based on criteria
+function setCharacters(params) {
   var passwordChars = [];
 
-  if (lowerCase) {
+  if (params[0]) {
     passwordChars.push(
       lowerCaseValues[Math.floor(Math.random() * lowerCaseValues.length)]
     );
   }
-  if (upperCase) {
+  if (params[1]) {
     passwordChars.push(
       upperCaseValues[Math.floor(Math.random() * upperCaseValues.length)]
     );
   }
-  if (numericValue) {
+  if (params[2]) {
     passwordChars.push(
       numberValues[Math.floor(Math.random() * numberValues.length)]
     );
   }
-  if (specialChar) {
+  if (params[3]) {
     passwordChars.push(
       specialCharacterValues[
         Math.floor(Math.random() * specialCharacterValues.length)
       ]
     );
   }
+
   return passwordChars;
 }
-// creating a function for random password generator using the password length and random array from above
-function generatePassword(
-  passwordLength,
-  lowerCase,
-  upperCase,
-  numericValue,
-  specialChar
-) {
+
+// Defining function to generate the password
+function generatePassword(params, length) {
   var finalPassword = "";
-  for (i = 0; i < passwordLength; i++) {
-    var finalPasswordCharacters = setCharacters(
-      lowerCase,
-      upperCase,
-      numericValue,
-      specialChar
-    );
+
+  for (i = 0; i < length; i++) {
+    var finalPasswordCharacters = setCharacters(params);
     finalPassword +=
       finalPasswordCharacters[
         Math.floor(Math.random() * finalPasswordCharacters.length)

@@ -20,6 +20,8 @@ Please refer to the LICENSE in the repo.
 
 ## Webpage URL
 
+https://wchoi888.github.io/BC092523-C3/
+
 ## Screenshot
 
 ![Random_Generator_Screenshot](image.png)
